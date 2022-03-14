@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and save container image
         run: |
-          podman build -t ${{ github.workflow }} .
+          podman build -t ${{ github.workflow }}:${{ github.sha }} .
           podman save -o /tmp/image.tar ${{ github.workflow }}
 
       - name: Upload artifact
@@ -106,7 +106,7 @@ jobs:
         uses: redhat-actions/push-to-registry@v2
         if: steps.image-exists.outputs.image-exists != 0
         with:
-          image: ${{ github.workflow }}
+          image: localhost/${{ github.workflow }}:${{ github.sha }}
           tags: latest ${{ steps.latest-tag.outputs.latest-tag }}
           registry: ${{ steps.login-ecr.outputs.registry }}
 
