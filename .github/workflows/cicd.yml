@@ -33,7 +33,7 @@ jobs:
   # centralized location, keeping the workflow code DRY.
   build-matrix:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
 
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
