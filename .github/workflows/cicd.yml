@@ -63,7 +63,7 @@ jobs:
           # fetch-depth needs to be set to 0 so that the job can fetch all the tags
           fetch-depth: 0
 
-      - name: Get the latest tag
+      - name: Get the latest git tag
         id: latest-tag
         run: |
           echo "::set-output name=latest-tag::$(git tag --sort "-committerdate" | sed -n 1p)"
