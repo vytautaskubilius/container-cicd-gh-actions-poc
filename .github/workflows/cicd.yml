@@ -35,6 +35,7 @@ jobs:
   # directory as the workflow. This allows us to configure the repositories to which the image will be pushed in a
   # centralized location, keeping the workflow code DRY.
   publish-matrix:
+    needs: build
     runs-on: ubuntu-latest
     if: (github.event_name == 'workflow_dispatch' && github.ref_name == 'main') || github.event_name == 'release'
 
