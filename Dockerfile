@@ -1,6 +1,6 @@
 # Use an intermediate step to build the nvml datadog integration
 # Setup taken from https://docs.datadoghq.com/agent/guide/community-integrations-installation-with-docker-agent/?tab=docker
-ARG DD_AGENT_VERSION=7.34.0
+ARG DD_AGENT_VERSION=8.34.0
 ARG PY_VERSION=3.8
 ARG INTEGRATIONS_VERSION=nvml-1.0.1
 
