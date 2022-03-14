@@ -52,6 +52,7 @@ jobs:
     needs: [build-matrix]
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      fail-fast: false
     environment:
       name: ${{ matrix.account_name }}-${{ matrix.account_id }}
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
