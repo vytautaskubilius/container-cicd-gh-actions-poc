@@ -9,6 +9,11 @@
       "account_name": "sandbox",
       "account_id": "661063309281",
       "region": "us-east-2"
+    },
+    {
+      "account_name": "sandbox",
+      "account_id": "661063309281",
+      "region": "eu-north-1"
     }
   ]
 }
