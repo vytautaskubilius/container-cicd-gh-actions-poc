@@ -28,8 +28,8 @@ jobs:
           containerfiles: |
             ./Dockerfile
 
-  # This job creates a strategy matrix for subsequent jobs from the config.json file that is hosted in the same
-  # directory as the workflows. This allows us to configure the repositories to which the image will be pushed in a
+  # This job creates a strategy matrix for the publish job from the config.json file that is hosted in the same
+  # directory as the workflow. This allows us to configure the repositories to which the image will be pushed in a
   # centralized location, keeping the workflow code DRY.
   build-matrix:
     runs-on: ubuntu-latest
