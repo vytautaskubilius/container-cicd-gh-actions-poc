@@ -1,2 +1,1 @@
-# container-cicd-gh-actions-poc
-GitHub Actions PoC for building container images and publishing to AWS ECR
+# GitHub Actions PoC for building and publishing container images to AWS ECR
