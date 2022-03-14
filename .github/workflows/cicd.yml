@@ -84,7 +84,7 @@ jobs:
       - name: Check if image exists already
         id: image-exists
         run: |
-          echo "::set-output name=image-exists::$(aws ecr describe-images --repository-name=${{ github.workflow }} --image-ids=imageTag=${{ steps.latest-tag.outputs.latest-tag }} &> /dev/null)"
+          echo "::set-output name=image-exists::$(aws ecr describe-images --repository-name=${{ github.workflow }} --image-ids=imageTag=${{ steps.latest-tag.outputs.latest-tag }} &> /dev/null; echo $?)"
 
       - name: Build container image
         id: build-image
