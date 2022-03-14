@@ -66,11 +66,7 @@ jobs:
       - name: Get the latest tag
         id: latest-tag
         run: |
-          echo "::set-output name=latest-tag::$(git tag --sort "-committerdate" | sed -n 2p)"
-
-      - name: debug tag
-        run: |
-          echo ${{ steps.latest-tag.outputs.latest-tag }}
+          echo "::set-output name=latest-tag::$(git tag --sort "-committerdate" | sed -n 1p)"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
