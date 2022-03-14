@@ -14,27 +14,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
 
     steps:
       - name: Check out the code
         uses: actions/checkout@v3
 
-      - name: Build and save container image
-        run: |
-          podman build -t ${{ github.workflow }}:latest .
-          podman save -o /tmp/image.tar ${{ github.workflow }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
         with:
-          name: ${{ github.sha }}
-          path: /tmp/image.tar
+          image: ${{ github.workflow }}
+          tags: latest ${{ github.sha }}
+          containerfiles: |
+            ./Dockerfile
 
   # This job creates a strategy matrix for the publish job from the config.json file that is hosted in the same
   # directory as the workflow. This allows us to configure the repositories to which the image will be pushed in a
   # centralized location, keeping the workflow code DRY.
-  publish-matrix:
-    needs: build
+  build-matrix:
     runs-on: ubuntu-latest
     if: (github.event_name == 'workflow_dispatch' && github.ref_name == 'main') || github.event_name == 'release'
 
@@ -52,9 +49,9 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    needs: publish-matrix
+    needs: [build-matrix]
     strategy:
-      matrix: ${{ fromJson(needs.publish-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       fail-fast: false
     environment:
       name: ${{ matrix.account_name }}-${{ matrix.account_id }}
@@ -90,32 +87,20 @@ jobs:
         run: |
           echo "::set-output name=image-exists::$(aws ecr describe-images --repository-name=${{ github.workflow }} --image-ids=imageTag=${{ steps.latest-tag.outputs.latest-tag }} &> /dev/null; echo $?)"
 
-      - name: Download artifact
+      - name: Build container image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
         if: steps.image-exists.outputs.image-exists != 0
-        uses: actions/download-artifact@v2
         with:
-          name: ${{ github.sha }}
-          path: /tmp
-
-      - name: Load image
-        if: steps.image-exists.outputs.image-exists != 0
-        run: |
-          podman load --input /tmp/image.tar
+          image: ${{ github.workflow }}
+          tags: latest ${{ steps.latest-tag.outputs.latest-tag }}
+          containerfiles: |
+            ./Dockerfile
 
       - name: Push to ECR
         uses: redhat-actions/push-to-registry@v2
         if: steps.image-exists.outputs.image-exists != 0
         with:
-          image: localhost/${{ github.workflow }}
-          tags: latest ${{ steps.latest-tag.outputs.latest-tag }}
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
           registry: ${{ steps.login-ecr.outputs.registry }}
-
-  delete-artifact:
-    runs-on: ubuntu-latest
-    needs: publish
-
-    steps:
-      - name: Delete the build artifact
-        uses: geekyeggo/delete-artifact@v1
-        with:
-          name: ${{ github.sha }}
